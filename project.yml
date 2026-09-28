@@ -1,0 +1,29 @@
+# XcodeGen spec: `xcodegen generate` turns this into Cinewave.xcodeproj (not checked in).
+# Bump MARKETING_VERSION for a release; CI sets the build number from the run number.
+name: Cinewave
+options:
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    # Your Apple Developer team ID (developer.apple.com → Membership). CI passes it in instead.
+    DEVELOPMENT_TEAM: ""
+targets:
+  Cinewave:
+    type: application
+    platform: iOS
+    sources:
+      - path: Cinewave
+    settings:
+      base:
+        PRODUCT_NAME: Cinewave
+        PRODUCT_BUNDLE_IDENTIFIER: in.co.nikolatesla.cinewave
+        INFOPLIST_FILE: Cinewave/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.0"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
