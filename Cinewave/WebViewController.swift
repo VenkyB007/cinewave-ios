@@ -2,8 +2,9 @@ import UIKit
 import WebKit
 
 /// WKWebView shell around the web app, plus what a web page can't do on its own inside an app:
-/// Google sign-in, which Google refuses inside web views (SignInHandoff), and links that leave
-/// the app for Safari or the app they belong to.
+/// Google sign-in, which Google refuses inside web views (SignInHandoff), saving movies and
+/// photos to the Files app (Downloads), and links that leave the app for Safari or the app
+/// they belong to.
 final class WebViewController: UIViewController {
 
     private var webView: WKWebView!
@@ -11,6 +12,7 @@ final class WebViewController: UIViewController {
     private let offline = UIStackView()
     private var progressWatch: NSKeyValueObservation?
     private let signIn = SignInHandoff()
+    private let downloads = Downloads()
 
     override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
 
@@ -144,6 +146,8 @@ extension WebViewController: WKNavigationDelegate {
         }
         // Embedded frames load in place; only where the whole app goes is our business.
         if action.targetFrame?.isMainFrame == false { return .allow }
+        // A movie, photo or zip being saved (<a download>): a file to keep, not a page to show.
+        if action.shouldPerformDownload && Self.isInApp(url) { return .download }
         if Self.isInApp(url) { return .allow }
         if SignInHandoff.isGoogleSignIn(url) {
             startSignIn()
@@ -151,6 +155,25 @@ extension WebViewController: WKNavigationDelegate {
         }
         openOutside(url)
         return .cancel
+    }
+
+    /// A file the page can't show (an attachment, or a type WebKit has no viewer for, like .mkv)
+    /// is saved instead of leaving a blank page: ?download=1 answers with Content-Disposition: attachment.
+    func webView(_ webView: WKWebView, decidePolicyFor response: WKNavigationResponse) async -> WKNavigationResponsePolicy {
+        guard response.isForMainFrame, let url = response.response.url, Self.isInApp(url) else { return .allow }
+        if !response.canShowMIMEType { return .download }
+        if let http = response.response as? HTTPURLResponse,
+           let disposition = http.value(forHTTPHeaderField: "Content-Disposition")?.lowercased(),
+           disposition.hasPrefix("attachment") { return .download }
+        return .allow
+    }
+
+    func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
+        download.delegate = downloads
+    }
+
+    func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
+        download.delegate = downloads
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {

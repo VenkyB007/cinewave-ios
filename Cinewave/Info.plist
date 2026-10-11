@@ -26,6 +26,11 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<!-- Picture in Picture, and sound that keeps going with the screen locked. -->
+	<!-- Saved movies and photos (Downloads.swift) go to Documents; these show that folder in the Files app as "On My iPhone → Cinewave". -->
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

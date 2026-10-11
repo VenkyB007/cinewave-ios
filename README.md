@@ -12,7 +12,10 @@ iPhone shell around the Cinewave web app at `https://cinewave.nikolatesla.co.in`
 - Videos play full screen and rotate to landscape. **Picture in Picture** works, and sound keeps
   playing with the screen locked (`UIBackgroundModes: audio`).
 - "Play with" links to other players (VLC, Infuse …) open those apps.
-- Not yet in this shell: the Android app's offline downloads (`CinewaveApp.openDownloads`).
+- **Download** (1.1+): a movie's Download link, a photo or an album zip becomes a `WKDownload`
+  (`Downloads.swift`) saved to the app's Documents folder, which the Files app shows as
+  On My iPhone → Cinewave. The page's own Downloads sheet counts the bytes server-side (`?dl=`),
+  so it works here too. The Android app's native screen (`CinewaveApp.openDownloads`) stays Android-only.
 - The page can recognise the shell by `CinewaveIOS/<version>` in the user agent.
 - No self-update: new builds come through TestFlight, or a fresh sideload.
 
